@@ -33,7 +33,12 @@ export class TasksService {
   }
 
   update(id: string, dto: UpdateTaskDto): Task {
-    const updated: Task = { ...this.findOne(id), ...dto };
+    const { description, dueDate, ...fields } = dto;
+    const updated: Task = { ...this.findOne(id), ...fields };
+    // null means "clear"; omitted means "leave unchanged".
+    if (description !== undefined)
+      updated.description = description ?? undefined;
+    if (dueDate !== undefined) updated.dueDate = dueDate ?? undefined;
     this.tasks.set(id, updated);
     return updated;
   }
