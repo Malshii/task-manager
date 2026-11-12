@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DeleteTaskDialog } from "@/components/delete-task-dialog";
 import {
@@ -8,8 +8,14 @@ import {
   type TaskFormValues,
 } from "@/components/task-form-dialog";
 import { TaskTable } from "@/components/task-table";
+import { TaskToolbar } from "@/components/task-toolbar";
 import { Button } from "@/components/ui/button";
 import { createTask, deleteTask, getTasks, updateTask } from "@/lib/api";
+import {
+  getVisibleTasks,
+  type SortOrder,
+  type StatusFilter,
+} from "@/lib/task-view";
 import type { Task } from "@/lib/types";
 
 export default function Home() {
@@ -21,6 +27,13 @@ export default function Home() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const visibleTasks = useMemo(
+    () => getVisibleTasks(tasks, statusFilter, sortOrder),
+    [tasks, statusFilter, sortOrder],
+  );
 
   // Loading starts as true, so only the retry handler needs to reset it.
   const loadTasks = useCallback(() => {
@@ -118,11 +131,29 @@ export default function Home() {
           </Button>
         </div>
       ) : (
-        <TaskTable
-          tasks={tasks}
-          onEdit={openEditForm}
-          onDelete={setTaskToDelete}
-        />
+        <>
+          {tasks.length > 0 && (
+            <TaskToolbar
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              sortOrder={sortOrder}
+              onSortOrderToggle={() =>
+                setSortOrder((order) => (order === "asc" ? "desc" : "asc"))
+              }
+            />
+          )}
+          {tasks.length > 0 && visibleTasks.length === 0 ? (
+            <p className="py-16 text-center text-muted-foreground">
+              No tasks match this filter.
+            </p>
+          ) : (
+            <TaskTable
+              tasks={visibleTasks}
+              onEdit={openEditForm}
+              onDelete={setTaskToDelete}
+            />
+          )}
+        </>
       )}
 
       <TaskFormDialog
