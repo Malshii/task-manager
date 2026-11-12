@@ -1,8 +1,9 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
+import { configureApp } from '../src/app.setup';
 
 describe('Tasks (e2e)', () => {
   let app: INestApplication<App>;
@@ -13,14 +14,7 @@ describe('Tasks (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    // Must mirror the pipe configured in main.ts.
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
+    configureApp(app);
     await app.init();
   });
 
