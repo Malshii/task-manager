@@ -1,5 +1,5 @@
-import { PartialType, PickType } from '@nestjs/mapped-types';
 import {
+  IsEnum,
   IsISO8601,
   IsNotEmpty,
   IsOptional,
@@ -7,20 +7,21 @@ import {
   MaxLength,
   ValidateIf,
 } from 'class-validator';
-import { CreateTaskDto } from './create-task.dto';
+import { TaskStatus } from '../task-status.enum';
 
-// PartialType would add @IsOptional() to every field, which also skips
-// validation for null. So only `status` is inherited from it; the other
-// fields are declared explicitly with their own rules.
-export class UpdateTaskDto extends PartialType(
-  PickType(CreateTaskDto, ['status'] as const),
-) {
-  // May be omitted, but if sent it must be a valid title (null/"" -> 400).
+// Not built with PartialType: it adds @IsOptional() to every field, which also
+// skips validation for null. Fields are declared explicitly instead.
+export class UpdateTaskDto {
+  // title and status may be omitted, but if sent they must be valid (null -> 400).
   @ValidateIf((_, value) => value !== undefined)
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)
   title?: string;
+
+  @ValidateIf((_, value) => value !== undefined)
+  @IsEnum(TaskStatus)
+  status?: TaskStatus;
 
   // null explicitly clears the value.
   @IsOptional()
