@@ -17,16 +17,24 @@ A small full-stack task manager. A NestJS REST API stores tasks in memory, and a
 
 ## Prerequisites
 
-- **Node.js v20.19.0** (other Node 20.x releases should work; this is the version it was built and tested with)
-- **npm 10.8.2** (ships with Node 20.19.0)
+- **Node.js 20.19 or later** (tested with v20.19.0)
+- **npm** (tested with 10.8.2, the version bundled with Node 20.19.0)
+- **Git**
 
 Check with `node -v` and `npm -v`. You do not need the Nest CLI installed.
 
 ## Getting started
 
-Run these from a fresh clone. You need two terminals, one for each app.
+Follow these steps in order. You need two terminals for steps 4 and 5, one for each app.
 
-### 1. Install dependencies
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/malshii/task-manager.git
+cd task-manager
+```
+
+### 2. Install dependencies
 
 ```bash
 cd api
@@ -36,7 +44,7 @@ npm install
 cd ..
 ```
 
-### 2. Environment files
+### 3. Environment files
 
 Copy each app's example file. The API reads `api/.env` and Next.js reads `web/.env.local`.
 
@@ -71,7 +79,7 @@ The defaults work as-is, so you only need to edit these files to change a value.
 
 The API loads `.env` from the directory you start it in, so run it from `api/` as shown below. A variable set in your shell takes priority over the file. If you change `PORT`, also change `NEXT_PUBLIC_API_URL` to match. Restart each app after editing its env file.
 
-### 3. Start the backend (terminal 1)
+### 4. Start the backend (terminal 1)
 
 ```bash
 cd api
@@ -80,14 +88,14 @@ npm run start:dev
 
 The API is ready when you see `Nest application successfully started`. It listens on <http://localhost:3001>.
 
-### 4. Start the frontend (terminal 2)
+### 5. Start the frontend (terminal 2)
 
 ```bash
 cd web
 npm run dev
 ```
 
-### 5. Open the app
+### 6. Open the app
 
 - Web app: <http://localhost:3000>
 - API: <http://localhost:3001/tasks>
@@ -125,6 +133,8 @@ Base URL: `http://localhost:3001`. Requests and responses are JSON.
 | `DELETE` | `/tasks/:id` | 204, no body        | 404      |
 
 ### Examples
+
+These curl examples need a Unix-style shell. On Windows, run them in **Git Bash** (installed with Git); they do not work as written in PowerShell or Command Prompt. On macOS and Linux, use the normal terminal.
 
 **Create a task**
 
@@ -212,8 +222,6 @@ curl -i http://localhost:3001/tasks/does-not-exist
   "statusCode": 404
 }
 ```
-
-On Windows PowerShell, use `curl.exe` instead of `curl` (which is an alias for a different command) and escape the quotes in the JSON, or use Git Bash.
 
 ## Running tests
 
