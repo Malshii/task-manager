@@ -15,10 +15,16 @@ async function getErrorMessage(response: Response): Promise<string> {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...init?.headers },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      ...init,
+      headers: { "Content-Type": "application/json", ...init?.headers },
+    });
+  } catch {
+    // fetch only rejects when no response arrives (API down, network error, CORS).
+    throw new Error("Can't reach the server. Is the API running?");
+  }
 
   if (!response.ok) {
     throw new Error(await getErrorMessage(response));
