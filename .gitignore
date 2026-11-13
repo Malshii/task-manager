@@ -3,4 +3,4 @@ dist
 .next
 .env*
 !.env.example
-".vscode/" 
+.vscode/
