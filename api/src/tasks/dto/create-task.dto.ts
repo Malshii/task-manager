@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsEnum,
   IsISO8601,
@@ -7,8 +8,10 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { TaskStatus } from '../task-status.enum';
+import { trimString } from './trim-string';
 
 export class CreateTaskDto {
+  @Transform(trimString)
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)

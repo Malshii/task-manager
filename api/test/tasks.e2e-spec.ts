@@ -34,6 +34,7 @@ describe('Tasks (e2e)', () => {
     it.each([
       ['missing title', {}],
       ['empty title', { title: '' }],
+      ['whitespace-only title', { title: '   ' }],
       ['title over 200 chars', { title: 'a'.repeat(201) }],
       ['invalid status', { title: 'x', status: 'NOPE' }],
       ['invalid dueDate', { title: 'x', dueDate: 'tomorrow' }],
@@ -43,6 +44,12 @@ describe('Tasks (e2e)', () => {
       ['unknown property', { title: 'x', foo: 1 }],
     ])('returns 400 for %s', async (_name, body) => {
       await request(app.getHttpServer()).post('/tasks').send(body).expect(400);
+    });
+
+    it('stores the title trimmed', async () => {
+      const task = await createTask({ title: '  Padded title  ' });
+
+      expect(task.title).toBe('Padded title');
     });
   });
 
@@ -56,6 +63,7 @@ describe('Tasks (e2e)', () => {
     it.each([
       ['title null', { title: null }],
       ['title empty string', { title: '' }],
+      ['whitespace-only title', { title: '   ' }],
       ['status null', { status: null }],
       ['invalid status', { status: 'NOPE' }],
       ['invalid dueDate', { dueDate: 'tomorrow' }],
