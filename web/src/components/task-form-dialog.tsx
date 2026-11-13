@@ -47,8 +47,23 @@ export function TaskFormDialog({
   onSubmit,
   onClose,
 }: TaskFormDialogProps) {
+  // Lives here (not in the form) so Esc / outside click can be blocked while saving.
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (values: TaskFormValues) => {
+    setIsSubmitting(true);
+    try {
+      await onSubmit(values);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && !isSubmitting && onClose()}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{task ? "Edit task" : "New task"}</DialogTitle>
@@ -57,7 +72,12 @@ export function TaskFormDialog({
           </DialogDescription>
         </DialogHeader>
         {/* Dialog content unmounts when closed, so the form resets each time. */}
-        <TaskForm task={task} onSubmit={onSubmit} onClose={onClose} />
+        <TaskForm
+          task={task}
+          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit}
+          onClose={onClose}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -65,11 +85,12 @@ export function TaskFormDialog({
 
 interface TaskFormProps {
   task: Task | null;
+  isSubmitting: boolean;
   onSubmit: (values: TaskFormValues) => Promise<void>;
   onClose: () => void;
 }
 
-function TaskForm({ task, onSubmit, onClose }: TaskFormProps) {
+function TaskForm({ task, isSubmitting, onSubmit, onClose }: TaskFormProps) {
   const [values, setValues] = useState<TaskFormValues>({
     title: task?.title ?? "",
     description: task?.description ?? "",
@@ -78,7 +99,6 @@ function TaskForm({ task, onSubmit, onClose }: TaskFormProps) {
   });
   const [titleError, setTitleError] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const setValue = <K extends keyof TaskFormValues>(
     key: K,
@@ -95,14 +115,12 @@ function TaskForm({ task, onSubmit, onClose }: TaskFormProps) {
     }
     setTitleError(null);
 
-    setIsSubmitting(true);
     try {
       await onSubmit({ ...values, title: values.title.trim() });
     } catch (error) {
       setApiError(
         error instanceof Error ? error.message : "Something went wrong",
       );
-      setIsSubmitting(false);
     }
   };
 
