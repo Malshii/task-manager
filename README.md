@@ -255,8 +255,7 @@ I used AI tools throughout this assignment, but I tested and reviewed every chan
 - **Claude Code**: generated most of the code, phase by phase from a detailed prompt I wrote based on the brief. I asked it to stop after each small step so I could review, test and commit separately.
 - **Claude (chat)**: a mentor for learning NestJS, which was new to me (my
   background is Next.js/React and Express). I used it to plan the work, review each phase's output and help me plan the Git workflow.
-- **Postman**: manual testing of every endpoint, including the 400 and
-  404 cases.
+- **curl/Postman**: manual testing of every endpoint, including the 400 and 404 cases.
 
 **What I found and changed**
 
