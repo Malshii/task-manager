@@ -263,26 +263,19 @@ I used AI tools throughout this assignment, but I tested and reviewed every chan
 - **Claude Code**: generated most of the code, phase by phase from a detailed prompt I wrote based on the brief. I asked it to stop after each small step so I could review, test and commit separately.
 - **Claude (chat)**: a mentor for learning NestJS, which was new to me (my
   background is Next.js/React and Express). I used it to plan the work, review each phase's output and help me plan the Git workflow.
-- **curl/Postman**: manual testing of every endpoint, including the 400 and 404 cases.
+- **curl / Postman**: manual testing of every endpoint, including the 400 and 404 cases.
 
 **What I found and changed**
 
-- **Null values slipped through validation.** While manually testing the
-  API, I found that `PATCH /tasks/:id` with `{"title": null}` returned 200 and saved the title as `null`. The generated `UpdateTaskDto` used `PartialType`, which adds `@IsOptional()` to every field, and `@IsOptional()` skips validation for `null` as well as `undefined`. I had the update DTO rewritten as an explicit class using `@ValidateIf(v => v !== undefined)` for `title`, then found and fixed the same bug for `status`. `description` and `dueDate` still accept `null` on purpose, so the edit form can clear them.
-
+- **Null values slipped through validation.** While manually testing the API, I found that `PATCH /tasks/:id` with `{"title": null}` returned 200 and saved the title as `null`. The generated `UpdateTaskDto` used `PartialType`, which adds `@IsOptional()` to every field, and `@IsOptional()` skips validation for `null` as well as `undefined`. I had the update DTO rewritten as an explicit class using `@ValidateIf(v => v !== undefined)` for `title`, then found and fixed the same bug for `status`. `description` and `dueDate` still accept `null` on update on purpose, so the edit form can clear them. I added unit and e2e tests covering these cases.
 - **Duplicated config.** The generated e2e test had its own copy of the
   `ValidationPipe` settings, which could drift from `main.ts`. I moved the
   setup into a shared `configureApp()` in `app.setup.ts`, used by both.
-
 - **Environment variables.** The first version shipped an `api/.env.example` that the API never read. I added `@nestjs/config` so both apps follow the same "copy `.env.example`" step. The latest `@nestjs/config` requires Nest 11, so I pinned 4.0.4 for this Nest 10 project instead of upgrading the framework partway through.
-
 - **Tooling issues.** The global Nest CLI crashed on Node 20.19, so the project was scaffolded with `npx @nestjs/cli@10`. I also turned on full TypeScript `strict` mode, which is why DTO properties use the `!` assertion.
-
 - **Checking dependencies.** The latest shadcn CLI imports `cn` from an npm package called `cn`, not the usual local `clsx` + `tailwind-merge` helper. Before keeping it, I checked that it's the official package from shadcn.
-
 - **Git history.** I committed manually after each small step, so the history shows how the project was built. At one point the AI assumed nothing had been committed. I checked `git log` and confirmed it was wrong.
-
 - **Frontend.** I tested the UI by hand in the browser: create/edit/delete, validation messages, loading and error states (by stopping the API), toasts, and the filter and sort.
+- **Final review.** At the end, I had the AI review the whole repo against the brief. It found remaining gaps: `null` accepted on POST, whitespace-only titles, the form dialog closing mid-save, the raw "Failed to fetch" error, a broken `.gitignore` line and template leftovers. I fixed each one in its own commit, with regression tests where relevant.
 
-I can explain every file in this repository, and I made the final decision
-on every change.
+I can explain every file in this repository, and I made the final decision on every change.
