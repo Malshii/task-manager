@@ -37,6 +37,9 @@ describe('Tasks (e2e)', () => {
       ['title over 200 chars', { title: 'a'.repeat(201) }],
       ['invalid status', { title: 'x', status: 'NOPE' }],
       ['invalid dueDate', { title: 'x', dueDate: 'tomorrow' }],
+      ['null status', { title: 'x', status: null }],
+      ['null description', { title: 'x', description: null }],
+      ['null dueDate', { title: 'x', dueDate: null }],
       ['unknown property', { title: 'x', foo: 1 }],
     ])('returns 400 for %s', async (_name, body) => {
       await request(app.getHttpServer()).post('/tasks').send(body).expect(400);

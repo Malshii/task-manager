@@ -2,9 +2,9 @@ import {
   IsEnum,
   IsISO8601,
   IsNotEmpty,
-  IsOptional,
   IsString,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 import { TaskStatus } from '../task-status.enum';
 
@@ -14,15 +14,16 @@ export class CreateTaskDto {
   @MaxLength(200)
   title!: string;
 
-  @IsOptional()
+  // Optional fields may be omitted but not null, so null is never stored.
+  @ValidateIf((_, value) => value !== undefined)
   @IsString()
   description?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsEnum(TaskStatus)
   status?: TaskStatus;
 
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsISO8601()
   dueDate?: string;
 }
